@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>圣经之光 | Bible Light</title>
+<style>
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  @keyframes float {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+    100% { transform: translateY(0); }
+  }
+
+  body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at 50% 30%, #f8fafc, #dbeafe);
+    font-family: "Segoe UI", "Noto Sans SC", sans-serif;
+    color: #1e3a8a;
+    overflow: hidden;
+  }
+
+  .container {
+    text-align: center;
+    animation: fadeIn 1.2s ease;
+  }
+
+  h1 {
+    font-size: 36px;
+    margin-bottom: 10px;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  p {
+    font-size: 16px;
+    color: #334155;
+    margin-bottom: 30px;
+  }
+
+  button {
+    padding: 12px 26px;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 18px;
+    transition: 0.3s;
+  }
+
+  button:hover {
+    background: #1d4ed8;
+    transform: scale(1.05);
+  }
+
+  footer {
+    position: absolute;
+    bottom: 20px;
+    font-size: 14px;
+    color: #64748b;
+  }
+
+  audio { display:none; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>📖 圣经之光</h1>
+  <p>愿主的话语成为你脚前的灯，路上的光。</p>
+  <button onclick="startReading()">开始阅读圣经</button>
+</div>
+
+<footer>© 2025 Bible Light | 全球自由阅读</footer>
+
+<audio id="bgm" src="https://cdn.pixabay.com/download/audio/2023/06/12/audio_37c3b86a72.mp3?filename=piano-soft-148500.mp3" autoplay loop></audio>
+
+<script>
+  function startReading(){
+    const audio = document.getElementById('bgm');
+    audio.pause();
+    window.location.href = "bible.html";
+  }
+</script>
+</body>
+</html>
