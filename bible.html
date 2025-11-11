@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>圣经阅读 | Bible Reader</title>
+<style>
+  body {
+    margin: 0;
+    font-family: "Segoe UI", "Noto Sans SC", sans-serif;
+    background: linear-gradient(180deg,#f1f5f9,#e2e8f0);
+    color: #1e293b;
+  }
+  header {
+    background: #1e3a8a;
+    color: #fff;
+    padding: 12px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  header h1 {margin: 0; font-size: 20px;}
+  nav button {
+    background: #3b82f6;
+    border: none;
+    padding: 8px 12px;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-left: 6px;
+  }
+  main {
+    max-width: 960px;
+    margin: 20px auto;
+    padding: 12px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  #controls {
+    display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px;
+  }
+  input, select {
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #94a3b8;
+  }
+  .verse {
+    margin-bottom: 12px;
+    padding: 8px;
+    border-left: 4px solid #3b82f6;
+    background: #f8fafc;
+  }
+  .cn { font-size: 18px; color:#111827; }
+  .en { font-size: 14px; color:#475569; }
+  footer {
+    text-align: center;
+    margin: 30px 0;
+    color: #64748b;
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>📖 圣经阅读 Bible Reader</h1>
+  <nav>
+    <button onclick="openSettings()">设置</button>
+    <button onclick="playAudio()">🔊 播放</button>
+  </nav>
+</header>
+
+<main>
+  <div id="controls">
+    <select id="book">
+      <option value="genesis">创世记 Genesis</option>
+      <option value="john">约翰福音 John</option>
+    </select>
+    <select id="chapter"></select>
+    <input type="text" id="search" placeholder="搜索经文..." />
+    <button onclick="searchVerse()">搜索</button>
+    <button onclick="saveNote()">收藏/笔记</button>
+  </div>
+
+  <div id="verses"></div>
+</main>
+
+<footer>© 2025 Bible Reader - 供全球所有人自由阅读</footer>
+
+<script>
+// 模拟部分经文（后续可扩展到整本圣经）
+const BIBLE = {
+  genesis: {
+    1: [
+      {cn:"起初神创造天地。", en:"In the beginning God created the heaven and the earth."},
+      {cn:"地是空虚混沌，渊面黑暗；神的灵运行在水面上。", en:"And the earth was without form, and void; and darkness was upon the face of the deep."},
+    ],
+  },
+  john: {
+    3: [
+      {cn:"神爱世人，甚至将他的独生子赐给他们，叫一切信他的，不至灭亡，反得永生。", en:"For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life."},
+      {cn:"信子的人有永生；不信子的人得不着永生，神的震怒常在他身上。", en:"He that believeth on the Son hath everlasting life: and he that believeth not the Son shall not see life; but the wrath of God abideth on him."}
+    ]
+  }
+};
+
+const bookSel = document.getElementById('book');
+const chapSel = document.getElementById('chapter');
+const versesDiv = document.getElementById('verses');
+
+// 初始化章节选项
+function updateChapters(){
+  chapSel.innerHTML = "";
+  const book = bookSel.value;
+  const chapters = Object.keys(BIBLE[book]);
+  chapters.forEach(c=>{
+    const opt = document.createElement('option');
+    opt.value = c;
+    opt.textContent = `第 ${c} 章`;
+    chapSel.appendChild(opt);
+  });
+  showVerses();
+}
+
+// 显示经文
+function showVerses(){
+  versesDiv.innerHTML = "";
+  const book = bookSel.value;
+  const chap = chapSel.value;
+  const verses = BIBLE[book][chap];
+  verses.forEach(v=>{
+    const div = document.createElement('div');
+    div.className = 'verse';
+    div.innerHTML = `<div class="cn">${v.cn}</div><div class="en">${v.en}</div>`;
+    versesDiv.appendChild(div);
+  });
+}
+
+// 搜索
+function searchVerse(){
+  const q = document.getElementById('search').value.trim();
+  if(!q){alert('请输入关键词');return;}
+  versesDiv.innerHTML = "";
+  for(const b in BIBLE){
+    for(const c in BIBLE[b]){
+      for(const v of BIBLE[b][c]){
+        if(v.cn.includes(q) || v.en.toLowerCase().includes(q.toLowerCase())){
+          const div = document.createElement('div');
+          div.className='verse';
+          div.innerHTML = `<div class="cn">${v.cn}</div><div class="en">${v.en}</div>`;
+          versesDiv.appendChild(div);
+        }
+      }
+    }
+  }
+}
+
+// 收藏与笔记
+function saveNote(){
+  const selText = window.getSelection().toString();
+  if(!selText){alert('请选中经文内容再收藏');return;}
+  let notes = JSON.parse(localStorage.getItem('notes') || "[]");
+  notes.push({text:selText, time:new Date().toLocaleString()});
+  localStorage.setItem('notes', JSON.stringify(notes));
+  alert('已保存到笔记！');
+}
+
+// 播放
+function playAudio(){
+  const text = [...document.querySelectorAll('.cn')]
+    .map(el=>el.textContent)
+    .join(' ');
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'zh-CN';
+  speechSynthesis.speak(utter);
+}
+
+// 设置
+function openSettings(){
+  alert('设置功能将在下个版本中开放，包括：主题、语言、字体、语速等。');
+}
+
+bookSel.addEventListener('change',updateChapters);
+chapSel.addEventListener('change',showVerses);
+updateChapters();
+</script>
+</body>
+</html>
